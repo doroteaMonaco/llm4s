@@ -265,7 +265,8 @@ ${pairs.mkString("\n\n")}"""
       case scala.util.Success(updatedGraph) => Right(updatedGraph)
       case scala.util.Failure(ex) =>
         logger.warn(
-          s"Failed to parse disambiguation response, falling back to pre-disambiguation graph: ${Option(ex.getMessage).getOrElse(ex.toString)}"
+          s"Failed to parse disambiguation response, falling back to pre-disambiguation graph: ${Option(ex.getMessage)
+              .getOrElse(ex.toString)}"
         )
         Right(graph)
     }
