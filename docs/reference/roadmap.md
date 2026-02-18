@@ -29,7 +29,7 @@ The single source of truth for LLM4S project status and future direction.
 | Category | Feature | Status | Documentation |
 |----------|---------|--------|---------------|
 | **LLM Connectivity** | Multi-Provider Support | ✅ Complete | [Providers](/guide/providers) |
-| | OpenAI Integration | ✅ Complete | [Basic Usage](/guide/basic-usage) |
+| | OpenAI Integration | ✅ Complete | [Basic Usage](../guide/basic-usage) |
 | | Anthropic Integration | ✅ Complete | [Providers](/guide/providers) |
 | | Google Gemini Integration | ✅ Complete | [Providers](/guide/providers) |
 | | Azure OpenAI Integration | ✅ Complete | [Providers](/guide/providers) |
