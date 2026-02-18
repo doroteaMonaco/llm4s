@@ -441,7 +441,7 @@ val state2 = agent.continueConversation(
 
 - **Discord**: [Join our community](https://discord.gg/4uvTPn6qww) - Active community for questions
 - **GitHub Issues**: [Report bugs](https://github.com/llm4s/llm4s/issues) - Bug reports and feature requests
-- **Documentation**: Browse the [user guide](/guide/basic-usage) - Comprehensive guides
+- **Documentation**: Browse the [user guide](../guide/basic-usage) - Comprehensive guides
 - **Examples**: Check [working examples](/examples/) - 46 code samples
 
 ### Stay Updated
@@ -462,7 +462,7 @@ val state2 = agent.continueConversation(
 
 ### Week 1: Fundamentals
 1. ✅ Complete Getting Started (you are here!)
-2. Read [Basic Usage Guide](/guide/basic-usage)
+2. Read [Basic Usage Guide](../guide/basic-usage)
 3. Try [Basic Examples](/examples/basic)
 4. Experiment with different providers
 
@@ -489,7 +489,7 @@ val state2 = agent.continueConversation(
 ## Quick Links
 
 ### Documentation
-- [User Guide](/guide/basic-usage) - Feature guides
+- [User Guide](../guide/basic-usage) - Feature guides
 - [API Reference](/api/llm-client) - API docs
 - [Advanced Topics](/advanced/production) - Production topics
 
