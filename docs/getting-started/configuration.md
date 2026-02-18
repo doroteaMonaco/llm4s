@@ -892,7 +892,7 @@ Configuration complete! Now you can:
 1. **[Explore features →](next-steps)** - Dive into agents, tools, and more
 2. **[Browse examples →](/examples/)** - See configuration in action
 3. **[User guide →](../guide/basic-usage)** - Learn core concepts
-4. **[Observability →](/guide/observability)** - Set up tracing
+4. **[Observability →](../guide/observability)** - Set up tracing
 
 ---
 

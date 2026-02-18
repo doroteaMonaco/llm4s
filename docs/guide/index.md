@@ -49,6 +49,14 @@ Comprehensive guides for LLM4S features.
 - **[Image Generation](image-generation)** - Generate images with DALL-E and other providers
 - **[Speech](speech)** - Speech-to-text (STT) and text-to-speech (TTS)
 
+### Production & Observability
+
+- **[Observability](observability)** - Tracing, monitoring, and observability for production
+  - **Langfuse Integration**: Production-ready LLM observability platform
+  - **OpenTelemetry Support**: Enterprise observability with Datadog, New Relic, Honeycomb
+  - **Console Tracing**: Development-friendly local tracing
+  - **Metrics & Analytics**: Monitor costs, latency, tokens, and success rates
+
 ## Feature Coverage via Examples
 
 For features not yet documented as dedicated guides, see our **[Examples Gallery](/examples/)** which includes 69 working examples:
