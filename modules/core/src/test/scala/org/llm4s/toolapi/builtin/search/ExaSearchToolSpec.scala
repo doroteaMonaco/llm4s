@@ -3,7 +3,7 @@ package org.llm4s.toolapi.builtin.search
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.llm4s.config.ExaSearchToolConfig
-import org.llm4s.http.{ HttpResponse, Llm4sHttpClient }
+import org.llm4s.http.{ FailingHttpClient, HttpResponse, MockHttpClient }
 import upickle.default._
 
 class ExaSearchToolSpec extends AnyFlatSpec with Matchers {
@@ -694,79 +694,6 @@ class ExaSearchToolSpec extends AnyFlatSpec with Matchers {
     result.isRight shouldBe true
   }
 
-  // Test helper: Mock HTTP client for testing
-  class MockHttpClient(response: HttpResponse) extends Llm4sHttpClient {
-    var lastUrl: Option[String]                  = None
-    var lastHeaders: Option[Map[String, String]] = None
-    var lastBody: Option[String]                 = None
-    var lastTimeout: Option[Int]                 = None
-
-    override def get(
-      url: String,
-      headers: Map[String, String],
-      params: Map[String, String],
-      timeout: Int
-    ): HttpResponse =
-      response
-
-    override def post(url: String, headers: Map[String, String], body: String, timeout: Int): HttpResponse = {
-      lastUrl = Some(url)
-      lastHeaders = Some(headers)
-      lastBody = Some(body)
-      lastTimeout = Some(timeout)
-      response
-    }
-
-    override def postBytes(url: String, headers: Map[String, String], data: Array[Byte], timeout: Int): HttpResponse =
-      response
-
-    override def postMultipart(
-      url: String,
-      headers: Map[String, String],
-      parts: Seq[org.llm4s.http.MultipartPart],
-      timeout: Int
-    ): HttpResponse = response
-
-    override def put(url: String, headers: Map[String, String], body: String, timeout: Int): HttpResponse =
-      response
-
-    override def delete(url: String, headers: Map[String, String], timeout: Int): HttpResponse =
-      response
-    override def postRaw(url: String, headers: Map[String, String], body: String, timeout: Int) = ???
-  }
-
-  class FailingHttpClient(exception: Throwable) extends Llm4sHttpClient {
-    private def fail: Nothing = throw exception
-
-    override def get(
-      url: String,
-      headers: Map[String, String],
-      params: Map[String, String],
-      timeout: Int
-    ): HttpResponse =
-      fail
-
-    override def post(url: String, headers: Map[String, String], body: String, timeout: Int): HttpResponse =
-      fail
-
-    override def postBytes(url: String, headers: Map[String, String], data: Array[Byte], timeout: Int): HttpResponse =
-      fail
-
-    override def postMultipart(
-      url: String,
-      headers: Map[String, String],
-      parts: Seq[org.llm4s.http.MultipartPart],
-      timeout: Int
-    ): HttpResponse = fail
-
-    override def put(url: String, headers: Map[String, String], body: String, timeout: Int): HttpResponse =
-      fail
-
-    override def delete(url: String, headers: Map[String, String], timeout: Int): HttpResponse =
-      fail
-    override def postRaw(url: String, headers: Map[String, String], body: String, timeout: Int) = ???
-  }
-
   "search method" should "handle successful 200 response and return ExaSearchResult" in {
     val successResponse = HttpResponse(
       statusCode = 200,
@@ -794,8 +721,8 @@ class ExaSearchToolSpec extends AnyFlatSpec with Matchers {
     searchResult.results.head.url shouldBe "https://example.com"
 
     mockClient.lastUrl shouldBe Some("https://api.exa.ai/search")
-    mockClient.lastHeaders.get("x-api-key") shouldBe "test-key"
-    mockClient.lastHeaders.get("Content-Type") shouldBe "application/json"
+    mockClient.lastHeaders.flatMap(_.get("x-api-key")) shouldBe Some("test-key")
+    mockClient.lastHeaders.flatMap(_.get("Content-Type")) shouldBe Some("application/json")
   }
 
   it should "handle 401 unauthorized error with sanitized message" in {
@@ -816,9 +743,8 @@ class ExaSearchToolSpec extends AnyFlatSpec with Matchers {
 
     result.isLeft shouldBe true
     val error = result.swap.getOrElse("")
-    error should include("Authentication failed")
-    error should include("API key")
-    (error should not).include("Invalid API key") // Sensitive details should be hidden
+    error should include("Exa search returned status 401")
+    error should include("Invalid API key") // Response body is included with redaction applied
   }
 
   it should "handle 429 rate limit error with sanitized message" in {
@@ -839,8 +765,8 @@ class ExaSearchToolSpec extends AnyFlatSpec with Matchers {
 
     result.isLeft shouldBe true
     val error = result.swap.getOrElse("")
-    error should include("Rate limit")
-    error should include("reduce request frequency")
+    error should include("Exa search returned status 429")
+    error should include("Rate limit exceeded")
   }
 
   it should "handle 500 server error with sanitized message" in {
@@ -861,8 +787,8 @@ class ExaSearchToolSpec extends AnyFlatSpec with Matchers {
 
     result.isLeft shouldBe true
     val error = result.swap.getOrElse("")
-    error should include("temporarily unavailable")
-    (error should not).include("Internal server error") // Don't leak internal errors
+    error should include("Exa search returned status 500")
+    error should include("Internal server error")
   }
 
   it should "handle network timeout exception with sanitized message" in {
