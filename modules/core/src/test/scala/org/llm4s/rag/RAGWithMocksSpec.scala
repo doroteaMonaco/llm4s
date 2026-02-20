@@ -610,12 +610,13 @@ class RAGWithMocksSpec extends AnyFlatSpec with Matchers with BeforeAndAfterEach
     val result = rag.ingestText("Test content", "doc1")
 
     result.fold(
-      error => {
-        error shouldBe an[EmbeddingError]
-        error.message should include("empty embeddings")
-        val embError = error.asInstanceOf[EmbeddingError]
-        embError.provider should not be "unknown"
-        embError.provider shouldBe "text-embedding-3-small"
+      {
+        case embErr: EmbeddingError =>
+          embErr.message should include("empty embeddings")
+          embErr.provider should not be "unknown"
+          embErr.provider shouldBe "text-embedding-3-small"
+        case other =>
+          fail(s"Expected EmbeddingError but got: ${other.getClass.getSimpleName}: ${other.message}")
       },
       _ => fail("Expected EmbeddingError for empty embeddings")
     )
@@ -635,13 +636,14 @@ class RAGWithMocksSpec extends AnyFlatSpec with Matchers with BeforeAndAfterEach
     )
 
     result.fold(
-      error => {
-        error shouldBe an[EmbeddingError]
-        error.message should include("2 texts")
-        error.message should include("1 embedding")
-        val embError = error.asInstanceOf[EmbeddingError]
-        embError.provider should not be "unknown"
-        embError.provider shouldBe "text-embedding-3-small"
+      {
+        case embErr: EmbeddingError =>
+          embErr.message should include("2 texts")
+          embErr.message should include("1 embedding")
+          embErr.provider should not be "unknown"
+          embErr.provider shouldBe "text-embedding-3-small"
+        case other =>
+          fail(s"Expected EmbeddingError but got: ${other.getClass.getSimpleName}: ${other.message}")
       },
       _ => fail("Expected EmbeddingError for mismatched embeddings count")
     )

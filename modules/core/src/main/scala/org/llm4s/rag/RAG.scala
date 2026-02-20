@@ -963,7 +963,9 @@ final class RAG private (
         Left(
           EmbeddingError(
             None,
-            s"Embedding provider returned ${response.embeddings.length} embeddings for batch of ${texts.length} texts",
+            s"Embedding provider returned ${response.embeddings.length} ${
+                if (response.embeddings.length == 1) "embedding" else "embeddings"
+              } for batch of ${texts.length} texts",
             embeddingModelConfig.name
           )
         )
