@@ -1,3 +1,10 @@
+---
+layout: page
+title: Context Window Pruning
+nav_order: 11
+parent: User Guide
+---
+
 # Context Window Pruning Strategies
 
 Complete guide to LLM4S context window management and pruning strategies.
@@ -485,18 +492,20 @@ println(s"Conversation: $conversationTokens tokens = \$$totalCost")
 
 ## Observability & Monitoring
 
-### Track pruning events
+### Inspect pruning results
+
+Pruning happens automatically inside `runMultiTurn`. To observe it explicitly, apply
+`AgentState.pruneConversation` before running and compare message counts:
 
 ```scala
-agent.runWithEvents(query, tools, contextConfig = Some(config)) { event =>
-  event match {
-    case ContextWindowPruned(before, after, strategy) =>
-      logger.info(s"Pruned: ${before.length} → ${after.length} messages")
-      logger.info(s"Strategy: $strategy")
-      logger.info(s"Tokens removed: estimate")
-    case _ => ()
-  }
-}
+import org.llm4s.agent.AgentState
+
+val before = state.conversation.messages.length
+val pruned = AgentState.pruneConversation(state, config)
+val after  = pruned.conversation.messages.length
+
+if (after < before)
+  logger.info(s"Pruned ${before - after} messages (${before} → ${after})")
 ```
 
 ### Log pruning performance
