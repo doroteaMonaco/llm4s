@@ -170,6 +170,8 @@ object AgentState {
           pruneRecentTurnsOnly(messages, turns, config)
         case PruningStrategy.Custom(fn) =>
           fn(messages)
+        case adaptive: PruningStrategy.AdaptiveWindowing =>
+          pruneWithAdaptiveWindowing(messages, adaptive, config, tokenCounter)
       }
 
       state.copy(conversation = Conversation(prunedMessages))
@@ -270,6 +272,29 @@ object AgentState {
     } else {
       otherMsgs.drop(keepFromIndex)
     }
+  }
+
+  /**
+   * Prune using adaptive windowing strategy.
+   * Automatically calculates optimal window size based on model context and pricing.
+   */
+  private def pruneWithAdaptiveWindowing(
+    messages: Seq[Message],
+    strategy: PruningStrategy.AdaptiveWindowing,
+    config: ContextWindowConfig,
+    tokenCounter: Message => Int
+  ): Seq[Message] = {
+    // Calculate optimal window using adaptive strategy
+    val optimalTokens = strategy.calculateOptimalWindow
+
+    // Create a modified config with calculated token limit and preserve other settings
+    val adaptiveConfig = config.copy(
+      maxTokens = Some(optimalTokens),
+      maxMessages = None // Use token-based limit, not message count
+    )
+
+    // Apply OldestFirst strategy with the calculated window
+    pruneOldestFirst(messages, adaptiveConfig, tokenCounter)
   }
 
   /**
